@@ -2,13 +2,11 @@ import tr from '../index.js';
 
 const test = QUnit.test;
 
-let entity;
-
 QUnit.module('tr', {
     beforeEach: function () {
         tr.append({
             'hello': 'bonjour',
-            'hello ${}': 'bonjour ${0}'
+            'hello ${0}': 'bonjour ${0}'
         })
     }
 });

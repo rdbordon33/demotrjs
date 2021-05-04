@@ -49,3 +49,47 @@ test('ignores invalid index', assert => {
 
     assert.equal(m, 'john  ');
 });
+
+test('supports plural form', assert => {
+    tr.append({ 
+        '${} items': [
+            'no item',
+            '${0} item',
+            '${0} items'
+        ]
+    });
+
+    assert.equal(tr`${0} items`, 'no item');
+    assert.equal(tr`${1} items`, '1 item');
+    assert.equal(tr`${2} items`, '2 items');
+    assert.equal(tr`${42} items`, '42 items');
+});
+
+test('supports plural form for non numeric values', assert => {
+    tr.append({ 
+        '${} stuff': [
+            'no stuff',
+            'some stuff',
+            'unreachable stuff'
+        ]
+    });
+
+    assert.equal(tr`${false} stuff`, 'no stuff');
+    assert.equal(tr`${true} stuff`, 'some stuff');
+    assert.equal(tr`${''} stuff`, 'no stuff');
+    assert.equal(tr`${'any'} stuff`, 'some stuff');
+    assert.equal(tr`${[]} stuff`, 'some stuff');
+    assert.equal(tr`${['any']} stuff`, 'some stuff');
+});
+
+test('supports plural form even if no dynamic parameter is available', assert => {
+    tr.append({ 
+        'some stuff': [
+            'no stuff',
+            'some stuff',
+            'unreachable stuff'
+        ]
+    });
+
+    assert.equal(tr`some stuff`, 'no stuff');
+});

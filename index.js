@@ -26,6 +26,15 @@ class Translator {
             const tokens = translation.split(trMatchRegExp);
             this.strings = tokens.filter((_, i) => !(i % 2));
             this.argDescriptions = tokens.filter((_, i) => i % 2).map(v => parseInt(v));
+        } else if (Array.isArray(translation)) {
+            this.pluralForms = new Array(translation.length);
+            for (let i = 0; i < this.pluralForms.length; ++i) {
+                const tokens = translation[i].split(trMatchRegExp);
+                this.pluralForms[i] = {
+                    strings: tokens.filter((_, i) => !(i % 2)),
+                    argDescriptions: tokens.filter((_, i) => i % 2).map(v => parseInt(v))
+                }
+            }
         }
     }
 
@@ -37,15 +46,24 @@ class Translator {
         return Translator.createPattern(this.sentences);
     }
 
-    translate(args) {
-        if (this.argDescriptions) {
-            const newArgs = new Array(this.argDescriptions.length);
-            for (let i = 0; i < newArgs.length; ++i) {
-                newArgs[i] = args[this.argDescriptions[i]];
-            }
-            return assemble(this.strings, newArgs);
+    getInfo(args) {
+        if (this.pluralForms) {
+            const value = (typeof args[0] === "number") ? args[0] : (args[0] ? 1 : 0);
+            return this.pluralForms[Math.min(Math.max(0, value), this.pluralForms.length - 1)];
         }
-        return assemble(this.strings, args);
+        return this;
+    }
+
+    translate(args) {
+        const info = this.getInfo(args);
+        if (info.argDescriptions) {
+            const newArgs = new Array(info.argDescriptions.length);
+            for (let i = 0; i < newArgs.length; ++i) {
+                newArgs[i] = args[info.argDescriptions[i]];
+            }
+            return assemble(info.strings, newArgs);
+        }
+        return assemble(info.strings, args);
     }
 }
 

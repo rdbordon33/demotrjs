@@ -42,7 +42,7 @@ test('translates and repeat arguments', assert => {
     assert.equal(m, 'john john');
 });
 
-test('ignores invalid index', assert => {
+test('ignores invalid index in the translation', assert => {
     tr.append({ 'with invalid index ${}': '${0} ${1} ${2}' });
 
     const m = tr`with invalid index ${'john'}`;

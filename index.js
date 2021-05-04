@@ -56,14 +56,11 @@ class Translator {
 
     translate(args) {
         const info = this.getInfo(args);
-        if (info.argDescriptions) {
-            const newArgs = new Array(info.argDescriptions.length);
-            for (let i = 0; i < newArgs.length; ++i) {
-                newArgs[i] = args[info.argDescriptions[i]];
-            }
-            return assemble(info.strings, newArgs);
+        const newArgs = new Array(info.argDescriptions.length);
+        for (let i = 0; i < newArgs.length; ++i) {
+            newArgs[i] = args[info.argDescriptions[i]];
         }
-        return assemble(info.strings, args);
+        return assemble(info.strings, newArgs);
     }
 }
 

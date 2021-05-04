@@ -19,11 +19,36 @@ test('returns original message when no translation available', assert => {
 });
 
 test('translates with one argument', assert => {
-    tr.append({ 'hello ${}': 'bonjour ${0}' });
+    tr.append({ 'hello ${}': 'bonjour ${}' });
 
     const m = tr`hello ${'john'}`;
 
     assert.equal(m, 'bonjour john');
+});
+
+test('translates with several arguments', assert => {
+    tr.append({ 'hello ${}, ${} and ${}': 'bonjour ${0}, ${1} et ${2}' });
+
+    const m = tr`hello ${'john'}, ${'samuel'} and ${'lucy'}`;
+
+    assert.equal(m, 'bonjour john, samuel et lucy');
+});
+
+test('allows whitespaces for the declaration of the argument', assert => {
+    tr.append({ 'hello ${}, ${} and ${}': 'bonjour ${0 }, ${ 1} et ${  2  }' });
+
+    const m = tr`hello ${'john'}, ${'samuel'} and ${'lucy'}`;
+
+    assert.equal(m, 'bonjour john, samuel et lucy');
+});
+
+
+test('can omit order number with several arguments', assert => {
+    tr.append({ 'hello ${}, ${} and ${}': 'bonjour ${}, ${} et ${}' });
+
+    const m = tr`hello ${'john'}, ${'samuel'} and ${'lucy'}`;
+
+    assert.equal(m, 'bonjour john, samuel et lucy');
 });
 
 test('translates with arguments in different order', assert => {
@@ -63,6 +88,21 @@ test('supports plural form', assert => {
     assert.equal(tr`${1} items`, '1 item');
     assert.equal(tr`${2} items`, '2 items');
     assert.equal(tr`${42} items`, '42 items');
+});
+
+test('supports plural form using mutiple arguments', assert => {
+    tr.append({ 
+        '${} ${#} items': [
+            '${0} no item',
+            '${0} ${1} item',
+            '${0} ${1} items'
+        ]
+    });
+
+    assert.equal(tr`${'check'} ${0} items`, 'check no item');
+    assert.equal(tr`${'check'} ${1} items`, 'check 1 item');
+    assert.equal(tr`${'check'} ${2} items`, 'check 2 items');
+    assert.equal(tr`${'check'} ${42} items`, 'check 42 items');
 });
 
 test('supports plural form for non numeric values', assert => {

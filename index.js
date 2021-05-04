@@ -1,11 +1,12 @@
 const trSymbol = Symbol();
 
 function assemble(strings, args) {
-    const result = [strings[0]];
+    const result = new Array(strings.length + args.length);
     for (let i = 0; i < args.length; ++i) {
-        result.push(args[i]);
-        result.push(strings[i + 1]);
+        result[i * 2] = strings[i];
+        result[(i * 2) + 1] = args[i];
     }
+    result[result.length - 1] = strings[strings.length - 1];
     return result.join('');
 }
 
@@ -16,26 +17,39 @@ function tr(strings, ...args) {
 
 tr[trSymbol] = {};
 
-const trSplitRegExp = /\$\{[^\}]*\}/;
-const trMatchRegExp = /\$\{([^\}]*)\}/;
+const argRegExp = /\$\{\s*([^\}]*)\s*\}/;
+
+class ArgDescriptor {
+    constructor(description, defaultPosition) {
+        this.position = parseInt(description);
+        if(isNaN(this.position)) {
+            this.position = defaultPosition;
+        }
+        if (description === '#') {
+            this.pluralValue = true;
+        }
+    }
+}
 
 class Translator {
     constructor(sentence, translation) {
-        this.sentences = sentence.split(trSplitRegExp);
+        this.sentence = this.parsePattern(sentence);
         if (typeof translation === 'string') {
-            const tokens = translation.split(trMatchRegExp);
-            this.strings = tokens.filter((_, i) => !(i % 2));
-            this.argDescriptions = tokens.filter((_, i) => i % 2).map(v => parseInt(v));
+            this.translation = this.parsePattern(translation);
         } else if (Array.isArray(translation)) {
-            this.pluralForms = new Array(translation.length);
-            for (let i = 0; i < this.pluralForms.length; ++i) {
-                const tokens = translation[i].split(trMatchRegExp);
-                this.pluralForms[i] = {
-                    strings: tokens.filter((_, i) => !(i % 2)),
-                    argDescriptions: tokens.filter((_, i) => i % 2).map(v => parseInt(v))
-                }
+            this.translations = new Array(translation.length);
+            for (let i = 0; i < this.translations.length; ++i) {
+                this.translations[i] = this.parsePattern(translation[i]);
             }
         }
+    }
+
+    parsePattern(pattern) {
+        const tokens = pattern.split(argRegExp);
+        return {
+            strings: tokens.filter((_, i) => !(i % 2)),
+            argDescriptions: tokens.filter((_, i) => i % 2).map((v, i) => new ArgDescriptor(v, i))
+        };
     }
 
     static createPattern(strings) {
@@ -43,22 +57,32 @@ class Translator {
     }
 
     get pattern() {
-        return Translator.createPattern(this.sentences);
+        return Translator.createPattern(this.sentence.strings);
+    }
+
+    get pluralValueArgumentIndex() {
+        for (let i = 0; i < this.sentence.argDescriptions.length; ++i) {
+            if (this.sentence.argDescriptions[i].pluralValue) {
+                return i;
+            }
+        }
+        return 0;
     }
 
     getInfo(args) {
-        if (this.pluralForms) {
-            const value = (typeof args[0] === "number") ? args[0] : (args[0] ? 1 : 0);
-            return this.pluralForms[Math.min(Math.max(0, value), this.pluralForms.length - 1)];
+        if (this.translations) {
+            const pluralValue = args[this.pluralValueArgumentIndex];
+            const value = (typeof pluralValue === "number") ? pluralValue : (pluralValue ? 1 : 0);
+            return this.translations[Math.min(Math.max(0, value), this.translations.length - 1)];
         }
-        return this;
+        return this.translation;
     }
 
     translate(args) {
         const info = this.getInfo(args);
         const newArgs = new Array(info.argDescriptions.length);
         for (let i = 0; i < newArgs.length; ++i) {
-            newArgs[i] = args[info.argDescriptions[i]];
+            newArgs[i] = args[info.argDescriptions[i].position];
         }
         return assemble(info.strings, newArgs);
     }

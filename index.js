@@ -1,4 +1,5 @@
 const trSymbol = Symbol();
+const argRegExp = /\$\{\s*([^\}]*)\s*\}/;
 
 function assemble(strings, args) {
     const result = new Array(strings.length + args.length);
@@ -16,8 +17,6 @@ function tr(strings, ...args) {
 }
 
 tr[trSymbol] = {};
-
-const argRegExp = /\$\{\s*([^\}]*)\s*\}/;
 
 class ArgDescriptor {
     constructor(description, defaultPosition) {
@@ -44,23 +43,23 @@ class Translator {
         }
     }
 
+    static createPattern(strings) {
+        return strings.join('${}');
+    }
+
     parsePattern(pattern) {
         const tokens = pattern.split(argRegExp);
         return {
             strings: tokens.filter((_, i) => !(i % 2)),
             argDescriptions: tokens.filter((_, i) => i % 2).map((v, i) => new ArgDescriptor(v, i))
-        };
-    }
-
-    static createPattern(strings) {
-        return strings.join('${}');
-    }
+        };    
+    }    
 
     get pattern() {
         return Translator.createPattern(this.sentence.strings);
     }
 
-    get pluralValueArgumentIndex() {
+    get argumentIndexForPlural() {
         for (let i = 0; i < this.sentence.argDescriptions.length; ++i) {
             if (this.sentence.argDescriptions[i].pluralValue) {
                 return i;
@@ -71,8 +70,8 @@ class Translator {
 
     getInfo(args) {
         if (this.translations) {
-            const pluralValue = args[this.pluralValueArgumentIndex];
-            const value = (typeof pluralValue === "number") ? pluralValue : (pluralValue ? 1 : 0);
+            const indexForPlural = args[this.argumentIndexForPlural];
+            const value = (typeof indexForPlural === "number") ? indexForPlural : (indexForPlural ? 1 : 0);
             return this.translations[Math.min(Math.max(0, value), this.translations.length - 1)];
         }
         return this.translation;

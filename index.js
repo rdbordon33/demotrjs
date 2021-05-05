@@ -1,4 +1,5 @@
 const trSymbol = Symbol();
+const ftSymbol = Symbol();
 const argRegExp = /\$\{\s*([^\}]*)\s*\}/;
 
 function assemble(strings, args) {
@@ -16,17 +17,25 @@ function tr(strings, ...args) {
     return !translator ? assemble(strings, args) : translator.translate(args);
 }
 
-tr[trSymbol] = {};
-
 class ArgDescriptor {
     constructor(description, defaultPosition) {
         this.position = parseInt(description);
-        if(isNaN(this.position)) {
+        if (isNaN(this.position)) {
             this.position = defaultPosition;
         }
         if (description === '#') {
             this.pluralValue = true;
         }
+        const separatorIndex = description.indexOf(':');
+        if (separatorIndex >= 0) {
+            this.formatter = description.slice(separatorIndex + 1).trim();
+        }
+    }
+
+    getValue(args) {
+        const formatter = tr[ftSymbol].get(this.formatter);
+        const value = args[this.position];
+        return formatter ? formatter.format(value) : value;
     }
 }
 
@@ -40,6 +49,11 @@ class Translator {
             for (let i = 0; i < this.translations.length; ++i) {
                 this.translations[i] = this.parsePattern(translation[i]);
             }
+        } else {
+            this.translation = {
+                strings: [String(translation)],
+                argDescriptions: []
+            }
         }
     }
 
@@ -52,8 +66,8 @@ class Translator {
         return {
             strings: tokens.filter((_, i) => !(i % 2)),
             argDescriptions: tokens.filter((_, i) => i % 2).map((v, i) => new ArgDescriptor(v, i))
-        };    
-    }    
+        };
+    }
 
     get pattern() {
         return Translator.createPattern(this.sentence.strings);
@@ -81,17 +95,40 @@ class Translator {
         const info = this.getInfo(args);
         const newArgs = new Array(info.argDescriptions.length);
         for (let i = 0; i < newArgs.length; ++i) {
-            newArgs[i] = args[info.argDescriptions[i].position];
+            newArgs[i] = info.argDescriptions[i].getValue(args);
         }
         return assemble(info.strings, newArgs);
     }
 }
 
-tr.append = function (translations) {
+tr.addTranslations = function (translations) {
     for (const key in translations) {
         const translator = new Translator(key, translations[key])
         tr[trSymbol][translator.pattern] = translator;
     }
 }
+
+tr.addFormatter = function (name, formatter) {
+    if (formatter && typeof formatter.format === 'function') {
+        tr[ftSymbol].set(name, formatter);
+    }
+}
+
+tr.load = function(config) {
+    for (const k in config['numberFormats']) {
+        tr.addFormatter(k, new Intl.NumberFormat(config['locales'], config['numberFormats'][k]))
+    }
+    for (const k in config['dateTimeFormats']) {
+        tr.addFormatter(k, new Intl.DateTimeFormat(config['locales'], config['dateTimeFormats'][k]))
+    }
+    tr.addTranslations(config['translations']);
+}
+
+tr.clear = function() {
+    tr[trSymbol] = {};
+    tr[ftSymbol] = new Map();    
+}
+
+tr.clear();
 
 export default tr;

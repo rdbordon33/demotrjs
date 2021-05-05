@@ -2,14 +2,24 @@ import tr from '../index.js';
 
 const test = QUnit.test;
 
-QUnit.module("tr");
+QUnit.module("tr", {
+    beforeEach: tr.clear
+});
 
 test('translates literal words', assert => {
-    tr.append({ 'hello': 'bonjour' });
+    tr.addTranslations({ 'hello': 'bonjour' });
 
     const m = tr`hello`;
 
     assert.equal(m, 'bonjour');
+});
+
+test('translates when translation is not as string', assert => {
+    tr.addTranslations({ 'hello': true });
+
+    const m = tr`hello`;
+
+    assert.equal(m, 'true');
 });
 
 test('returns original message when no translation available', assert => {
@@ -19,7 +29,7 @@ test('returns original message when no translation available', assert => {
 });
 
 test('translates with one argument', assert => {
-    tr.append({ 'hello ${}': 'bonjour ${}' });
+    tr.addTranslations({ 'hello ${}': 'bonjour ${}' });
 
     const m = tr`hello ${'john'}`;
 
@@ -27,7 +37,7 @@ test('translates with one argument', assert => {
 });
 
 test('translates with several arguments', assert => {
-    tr.append({ 'hello ${}, ${} and ${}': 'bonjour ${0}, ${1} et ${2}' });
+    tr.addTranslations({ 'hello ${}, ${} and ${}': 'bonjour ${0}, ${1} et ${2}' });
 
     const m = tr`hello ${'john'}, ${'samuel'} and ${'lucy'}`;
 
@@ -35,7 +45,7 @@ test('translates with several arguments', assert => {
 });
 
 test('allows whitespaces for the declaration of the argument', assert => {
-    tr.append({ 'hello ${}, ${} and ${}': 'bonjour ${0 }, ${ 1} et ${  2  }' });
+    tr.addTranslations({ 'hello ${}, ${} and ${}': 'bonjour ${0 }, ${ 1} et ${  2  }' });
 
     const m = tr`hello ${'john'}, ${'samuel'} and ${'lucy'}`;
 
@@ -44,7 +54,7 @@ test('allows whitespaces for the declaration of the argument', assert => {
 
 
 test('can omit order number with several arguments', assert => {
-    tr.append({ 'hello ${}, ${} and ${}': 'bonjour ${}, ${} et ${}' });
+    tr.addTranslations({ 'hello ${}, ${} and ${}': 'bonjour ${}, ${} et ${}' });
 
     const m = tr`hello ${'john'}, ${'samuel'} and ${'lucy'}`;
 
@@ -52,7 +62,7 @@ test('can omit order number with several arguments', assert => {
 });
 
 test('translates with arguments in different order', assert => {
-    tr.append({ 'reverse name ${} ${}': '${1} ${0}' });
+    tr.addTranslations({ 'reverse name ${} ${}': '${1} ${0}' });
 
     const m = tr`reverse name ${'john'} ${'doe'}`;
 
@@ -60,7 +70,7 @@ test('translates with arguments in different order', assert => {
 });
 
 test('translates and repeat arguments', assert => {
-    tr.append({ 'repeat firstname ${} ${}': '${0} ${0}' });
+    tr.addTranslations({ 'repeat firstname ${} ${}': '${0} ${0}' });
 
     const m = tr`repeat firstname ${'john'} ${'doe'}`;
 
@@ -68,7 +78,7 @@ test('translates and repeat arguments', assert => {
 });
 
 test('ignores invalid index in the translation', assert => {
-    tr.append({ 'with invalid index ${}': '${0} ${1} ${2}' });
+    tr.addTranslations({ 'with invalid index ${}': '${0} ${1} ${2}' });
 
     const m = tr`with invalid index ${'john'}`;
 
@@ -76,7 +86,7 @@ test('ignores invalid index in the translation', assert => {
 });
 
 test('supports plural form', assert => {
-    tr.append({ 
+    tr.addTranslations({
         '${} items': [
             'no item',
             '${0} item',
@@ -91,7 +101,7 @@ test('supports plural form', assert => {
 });
 
 test('supports plural form using mutiple arguments', assert => {
-    tr.append({ 
+    tr.addTranslations({
         '${} ${#} items': [
             '${0} no item',
             '${0} ${1} item',
@@ -106,7 +116,7 @@ test('supports plural form using mutiple arguments', assert => {
 });
 
 test('supports plural form for non numeric values', assert => {
-    tr.append({ 
+    tr.addTranslations({
         '${} stuff': [
             'no stuff',
             'some stuff',
@@ -123,7 +133,7 @@ test('supports plural form for non numeric values', assert => {
 });
 
 test('supports plural form even if no dynamic parameter is available', assert => {
-    tr.append({ 
+    tr.addTranslations({
         'some stuff': [
             'no stuff',
             'some stuff',
@@ -132,4 +142,41 @@ test('supports plural form even if no dynamic parameter is available', assert =>
     });
 
     assert.equal(tr`some stuff`, 'no stuff');
+});
+
+test('supports formatters', assert => {
+    tr.addFormatter('euros', new Intl.NumberFormat('en', { style: 'currency', currency: 'EUR' }))
+    tr.addFormatter('date', new Intl.DateTimeFormat('en', { dateStyle: 'medium' }))
+    tr.addTranslations({
+        'amount ${}': '${0:euros}',
+        'date ${}': '${:date}'
+    });
+
+    assert.equal(tr`amount ${1000}`, '€1,000.00');
+    assert.equal(tr`date ${new Date(2000, 0, 1)}`, 'Jan 1, 2000');
+});
+
+test('can load', assert => {
+    tr.load({
+        'locales': 'en',
+        'numberFormats': {
+            'dollars': { style: 'currency', currency: 'USD' }
+        },
+        'dateTimeFormats': {
+            'simpleDate': { dateStyle: 'medium' }
+        },
+        'translations': {
+            'amount ${}': '${:dollars}',
+            'date ${}': '${:simpleDate}'
+        }
+    });
+
+    assert.equal(tr`amount ${1000}`, '$1,000.00');
+    assert.equal(tr`date ${new Date(2000, 0, 1)}`, 'Jan 1, 2000');
+});
+
+test('can load with minimal config', assert => {
+    tr.load({});
+
+    assert.equal(tr`nothing to translate`, 'nothing to translate');
 });

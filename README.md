@@ -96,13 +96,13 @@ tr.addTranslations({
 });
 
 // print "no item"
-console.log(tr`${0} items`;
+console.log(tr`${0} items`);
 
 // print "1 item"
-console.log(tr`${1} items`;
+console.log(tr`${1} items`);
 
 // print "42 items"
-console.log(tr`${42} items`;
+console.log(tr`${42} items`);
 ```
 If the dynamic argument is a number, its value will be used to select the
 correct translation.
@@ -118,7 +118,7 @@ tr.addTranslations({
 });
 
 // print "cette proposition est vraie"
-console.log(tr`this proposal is ${true}`;
+console.log(tr`this proposal is ${true}`);
 ```
 
 If your template string contains several dynamic arguments, you can use
@@ -135,7 +135,7 @@ tr.addTranslations({
 });
 
 // print "Ref0001: no item"
-console.log(tr`${'Ref0001'}: ${0} items`;
+console.log(tr`${'Ref0001'}: ${0} items`);
 ```
 
 ### Support for converters
@@ -163,7 +163,7 @@ tr.addTranslations({
 })
 
 // print "€1,000.00"
-console.log(tr`${1000} euros`;
+console.log(tr`${1000} euros`);
 ```
 
 You can reference your formatter in the translation after the position of the 

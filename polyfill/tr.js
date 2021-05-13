@@ -5,8 +5,9 @@ function tr(strings, ...args) {
         }
         strings = strings.split('${}');
     }
-    const result = new Array(strings.length + args.length);
-    for (let i = 0; i < args.length; ++i) {
+    const maxArgs = Math.min(args.length, strings.length - 1);
+    const result = new Array(strings.length + maxArgs);
+    for (let i = 0; i < maxArgs; ++i) {
         result[i * 2] = strings[i];
         result[(i * 2) + 1] = args[i];
     }

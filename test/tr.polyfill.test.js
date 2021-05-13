@@ -25,6 +25,12 @@ test('can be called with first argument other than string or array', assert => {
     assert.equal(tr(2), '2');
 });
 
+test('translates with too many arguments', assert => {
+    const m = tr('hello', 'john', 'doe');
+
+    assert.equal(m, 'hello');
+});
+
 test('translates with several arguments', assert => {
     const m = tr`hello ${'john'}, ${'samuel'} and ${'lucy'}`;
 

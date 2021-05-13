@@ -52,6 +52,20 @@ test('can be called with first argument other than string or array', assert => {
     assert.equal(tr(2), 'two');
 });
 
+test('translates with arguments without declaring arguments in the sentence', assert => {
+    tr.addTranslations({ 'hello': 'bonjour ${0} ${1} !' });
+
+    const m = tr('hello', 'john', 'doe');
+
+    assert.equal(m, 'bonjour john doe !');
+});
+
+test('translates with too many arguments without translation available', assert => {
+    const m = tr('hello', 'john', 'doe');
+
+    assert.equal(m, 'hello');
+});
+
 test('translates with several arguments', assert => {
     tr.addTranslations({ 'hello ${}, ${} and ${}': 'bonjour ${0}, ${1} et ${2}' });
 

@@ -36,6 +36,16 @@ test('translates with one argument', assert => {
     assert.equal(m, 'bonjour john');
 });
 
+test('can be called like a function', assert => {
+    tr.addTranslations({ 'hello': 'bonjour' });
+    tr.addTranslations({ 'hello ${}': 'bonjour ${}' });
+
+    assert.equal(tr('hello'), 'bonjour');
+    assert.equal(tr('goodbye'), 'goodbye');
+    assert.equal(tr('hello ${}', 'john'), 'bonjour john');
+    assert.equal(tr('goodbye ${}', 'john'), 'goodbye john');
+});
+
 test('translates with several arguments', assert => {
     tr.addTranslations({ 'hello ${}, ${} and ${}': 'bonjour ${0}, ${1} et ${2}' });
 

@@ -1,6 +1,7 @@
 const trSymbol = Symbol();
 const ftSymbol = Symbol();
 const argRegExp = /\$\{\s*([^\}]*)\s*\}/;
+const argPlaceholder = '${}';
 
 function assemble(strings, args) {
     const result = new Array(strings.length + args.length);
@@ -13,8 +14,13 @@ function assemble(strings, args) {
 }
 
 function tr(strings, ...args) {
-    const translator = tr[trSymbol][Translator.createPattern(strings)];
-    return !translator ? assemble(strings, args) : translator.translate(args);
+    if (Array.isArray(strings)) {
+        const translator = tr[trSymbol][Translator.createPattern(strings)];
+        return translator ? translator.translate(args) : assemble(strings, args);
+    } else if (typeof strings === 'string') {
+        const translator = tr[trSymbol][strings];
+        return translator ? translator.translate(args) : assemble(strings.split(argPlaceholder), args);
+    }
 }
 
 class ArgDescriptor {
@@ -58,7 +64,7 @@ class Translator {
     }
 
     static createPattern(strings) {
-        return strings.join('${}');
+        return strings.join(argPlaceholder);
     }
 
     parsePattern(pattern) {
@@ -114,7 +120,7 @@ tr.addFormatter = function (name, formatter) {
     }
 }
 
-tr.load = function(config) {
+tr.load = function (config) {
     for (const k in config['numberFormats']) {
         tr.addFormatter(k, new Intl.NumberFormat(config['locales'], config['numberFormats'][k]))
     }
@@ -124,9 +130,9 @@ tr.load = function(config) {
     tr.addTranslations(config['translations']);
 }
 
-tr.clear = function() {
+tr.clear = function () {
     tr[trSymbol] = {};
-    tr[ftSymbol] = new Map();    
+    tr[ftSymbol] = new Map();
 }
 
 tr.clear();

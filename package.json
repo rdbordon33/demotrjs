@@ -2,7 +2,7 @@
   "name": "trjs",
   "version": "0.1.0",
   "description": "A lightweight library to support i18n",
-  "main": "index.js",
+  "main": "tr.js",
   "type": "module",
   "scripts": {
     "test": "qunit",

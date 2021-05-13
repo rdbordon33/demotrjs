@@ -20,6 +20,10 @@ module.exports = function (config) {
         type: 'module'
       },
       {
+        pattern: 'polyfill/tr.js',
+        type: 'module'
+      },
+      {
         pattern: 'test/**/*.js',
         type: 'module'
       }
@@ -32,7 +36,8 @@ module.exports = function (config) {
       // source files, that you wanna generate coverage for
       // do not include tests or libraries
       // (these files will be instrumented by Istanbul)
-      'tr.js': ['coverage']
+      'tr.js': ['coverage'],
+      'polyfill/tr.js': ['coverage']
     },
 
     // optionally, configure the reporter

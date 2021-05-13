@@ -46,6 +46,12 @@ test('can be called like a function', assert => {
     assert.equal(tr('goodbye ${}', 'john'), 'goodbye john');
 });
 
+test('can be called with first argument other than string or array', assert => {
+    tr.addTranslations({ '2': 'two' });
+
+    assert.equal(tr(2), 'two');
+});
+
 test('translates with several arguments', assert => {
     tr.addTranslations({ 'hello ${}, ${} and ${}': 'bonjour ${0}, ${1} et ${2}' });
 

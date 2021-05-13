@@ -17,7 +17,10 @@ function tr(strings, ...args) {
     if (Array.isArray(strings)) {
         const translator = tr[trSymbol][Translator.createPattern(strings)];
         return translator ? translator.translate(args) : assemble(strings, args);
-    } else if (typeof strings === 'string') {
+    } else {
+        if (typeof strings !== 'string') {
+            strings = String(strings);
+        }
         const translator = tr[trSymbol][strings];
         return translator ? translator.translate(args) : assemble(strings.split(argPlaceholder), args);
     }

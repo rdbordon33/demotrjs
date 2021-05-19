@@ -57,7 +57,7 @@ const translation = tr`hello ${name}`;
 
 ### Changing order of the dynamic arguments
 
-If the order of the arguments is not the same in translated expression,
+If the order of the arguments is not the same in the translated expression,
 you can specify explicitly the position of the dynamic arguments:
 
 ```javascript
@@ -138,17 +138,16 @@ tr.addTranslations({
 console.log(tr`${'Ref0001'}: ${0} items`);
 ```
 
-### Support for converters
+### Support for formatters
 
-You can register a converter to be able to use it in a translation.
+You can register a formatter to be able to use it in a translation.
 
-A converter is an object having a ```format``` method. This method
+A formatter is an object with a method named ```format```. This method
 will receive the value of the dynamic argument as parameter and will return
 the formatted value.
 
 [Intl.NumberFormat](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat) 
-and [Intl.DateTimeFormat](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat) are compliant with
-this format. You can use instance of these classes as formatters.
+and [Intl.DateTimeFormat](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat) are compliant with this format.
 
 Use the function ```tr.addFormatter``` to add new named formatter:
 
@@ -167,8 +166,8 @@ console.log(tr`${1000} euros`);
 ```
 
 You can reference your formatter in the translation after the position of the 
-dynamic argument by using the separator ```:```. If you want to omit the 
-position of the dynamic parameter, you still have to specify the separator:
+dynamic argument by using the separator ```:```. If you omit the  position of 
+the dynamic parameter, you still have to specify the separator:
 
 ```javascript
 tr.addTranslations({

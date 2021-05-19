@@ -135,13 +135,13 @@ tr.addTranslations = function (translations) {
 }
 
 /**
- * Registers a new converter by its name.
+ * Registers a new formatter by its name.
  * 
- * A converter is an object having a method named format. This method
+ * A formatter is an object having a method named format. This method
  * will receive the value of the dynamic argument as parameter and will return
  * the formatted value.
- * @param {string} name The name of the converter 
- * @param {Object} formatter The converter itself
+ * @param {string} name The name of the formatter 
+ * @param {Object} formatter The formatter itself
  */
 tr.addFormatter = function (name, formatter) {
     if (formatter && typeof formatter.format === 'function') {

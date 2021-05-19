@@ -14,19 +14,6 @@ function assemble(strings, args) {
     return result.join('');
 }
 
-function tr(strings, ...args) {
-    if (Array.isArray(strings)) {
-        const translator = tr[trSymbol][Translator.createPattern(strings)];
-        return translator ? translator.translate(args) : assemble(strings, args);
-    } else {
-        if (typeof strings !== 'string') {
-            strings = String(strings);
-        }
-        const translator = tr[trSymbol][strings];
-        return translator ? translator.translate(args) : assemble(strings.split(argPlaceholder), args);
-    }
-}
-
 class ArgDescriptor {
     constructor(description, defaultPosition) {
         this.position = parseInt(description);
@@ -111,6 +98,35 @@ class Translator {
     }
 }
 
+/**
+ * tr can be used as a function or a tag function of template literals.
+ * 
+ * As a function, the first parameter is the template with dynamic parameters indicated by ${}.
+ * The remaining parameters are the values for the dynamic parameters.
+ * @param {(any|string[])} strings 
+ * @param  {...any} args 
+ * @returns {string} The translation 
+ */
+function tr(strings, ...args) {
+    if (Array.isArray(strings)) {
+        const translator = tr[trSymbol][Translator.createPattern(strings)];
+        return translator ? translator.translate(args) : assemble(strings, args);
+    } else {
+        if (typeof strings !== 'string') {
+            strings = String(strings);
+        }
+        const translator = tr[trSymbol][strings];
+        return translator ? translator.translate(args) : assemble(strings.split(argPlaceholder), args);
+    }
+}
+
+/**
+ * Provides new translations.
+ * 
+ * This function expects an object as parameter. 
+ * Each key of the object is a template string and the value is the translated message:
+ * @param {Object} translations 
+ */
 tr.addTranslations = function (translations) {
     for (const key in translations) {
         const translator = new Translator(key, translations[key])
@@ -118,12 +134,26 @@ tr.addTranslations = function (translations) {
     }
 }
 
+/**
+ * Registers a new converter by its name.
+ * 
+ * A converter is an object having a method named format. This method
+ * will receive the value of the dynamic argument as parameter and will return
+ * the formatted value.
+ * @param {string} name The name of the converter 
+ * @param {Object} formatter The converter itself
+ */
 tr.addFormatter = function (name, formatter) {
     if (formatter && typeof formatter.format === 'function') {
         tr[ftSymbol].set(name, formatter);
     }
 }
 
+/**
+ * Loads complete configuration.
+ * 
+ * @param {Object} config 
+ */
 tr.load = function (config) {
     for (const k in config['numberFormats']) {
         tr.addFormatter(k, new Intl.NumberFormat(config['locales'], config['numberFormats'][k]))
@@ -134,6 +164,9 @@ tr.load = function (config) {
     tr.addTranslations(config['translations']);
 }
 
+/**
+ * Clear all the configurations: translations and converters.
+ */
 tr.clear = function () {
     tr[trSymbol] = {};
     tr[ftSymbol] = new Map();

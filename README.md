@@ -25,6 +25,12 @@ const w = "world";
 const translation = tr`Hello the ${w}`;
 ```
 
+## Installation
+
+```
+npm install @dgayerie/tr
+```
+
 ## Configuring translations
 
 You use the function ```tr.addTranslations``` to provide new translations. This

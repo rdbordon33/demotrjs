@@ -11,7 +11,7 @@ export default tr;
 declare function tr(strings: (any | string[]), ...args: any[]): string;
 declare namespace tr {
     function addTranslations(translations: any): void;
-    function addFormatter(name: string, formatter: any): void;
+    function addFormatters(formatters: any): void;
     function load(config: any): void;
     function clear(): void;
 }

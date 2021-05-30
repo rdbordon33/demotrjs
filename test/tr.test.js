@@ -115,6 +115,15 @@ test('ignores invalid index in the translation', assert => {
     assert.equal(m, 'john  ');
 });
 
+test('used additional index in the translation for function call', assert => {
+    tr.addTranslations({ 'simple': '${0} ${1}' });
+
+    const m = tr('simple', 'john', 'doe');
+
+    assert.equal(m, 'john doe');
+});
+
+
 test('supports plural form', assert => {
     tr.addTranslations({
         '${} items': [
@@ -174,9 +183,11 @@ test('supports plural form even if no dynamic parameter is available', assert =>
     assert.equal(tr`some stuff`, 'no stuff');
 });
 
-test('supports formatters', assert => {
-    tr.addFormatter('euros', new Intl.NumberFormat('en', { style: 'currency', currency: 'EUR' }))
-    tr.addFormatter('date', new Intl.DateTimeFormat('en', { dateStyle: 'medium' }))
+test('supports intl formatters', assert => {
+    tr.addFormatters({
+        'euros': new Intl.NumberFormat('en', { style: 'currency', currency: 'EUR' }),
+        'date': new Intl.DateTimeFormat('en', { dateStyle: 'medium' })
+    });
     tr.addTranslations({
         'amount ${}': '${0:euros}',
         'date ${}': '${:date}'
@@ -184,6 +195,17 @@ test('supports formatters', assert => {
 
     assert.equal(tr`amount ${1000}`, '€1,000.00');
     assert.equal(tr`date ${new Date(2000, 0, 1)}`, 'Jan 1, 2000');
+});
+
+test('supports function formatters', assert => {
+    tr.addFormatters({
+        'upper': s => s.toUpperCase()
+    });
+    tr.addTranslations({
+        'yell ${}': '${:upper}',
+    });
+
+    assert.equal(tr`yell ${'hello'}`, 'HELLO');
 });
 
 test('can load', assert => {

@@ -14,6 +14,16 @@ function assemble(strings, args) {
     return result.join('');
 }
 
+function addFormatter(name, formatter) {
+    if (name && formatter) {
+        if (typeof formatter.format === 'function') {
+            tr[ftSymbol].set(name, formatter.format.bind(formatter));
+        } else if (typeof formatter === 'function') {
+            tr[ftSymbol].set(name, formatter);
+        }
+    }
+}
+
 class ArgDescriptor {
     constructor(description, defaultPosition) {
         this.position = parseInt(description);
@@ -32,7 +42,7 @@ class ArgDescriptor {
     getValue(args) {
         const formatter = tr[ftSymbol].get(this.formatter);
         const value = args[this.position];
-        return formatter ? formatter.format(value) : value;
+        return formatter ? formatter(value) : value;
     }
 }
 
@@ -100,12 +110,12 @@ class Translator {
 
 /**
  * tr can be used as a function or a tag function of template literals.
- * 
+ *
  * As a function, the first parameter is the template with dynamic parameters indicated by ${}.
  * The remaining parameters are the values for the dynamic parameters.
- * @param {(any|string[])} strings 
- * @param  {...any} args 
- * @returns {string} The translation 
+ * @param {(any|string[])} strings
+ * @param  {...any} args
+ * @returns {string} The translation
  */
 function tr(strings, ...args) {
     if (Array.isArray(strings)) {
@@ -122,10 +132,10 @@ function tr(strings, ...args) {
 
 /**
  * Provides new translations.
- * 
- * This function expects an object as parameter. 
+ *
+ * This function expects an object as parameter.
  * Each key of the object is a template string and the value is the translated message:
- * @param {Object} translations 
+ * @param {Object} translations
  */
 tr.addTranslations = function (translations) {
     for (const key in translations) {
@@ -135,37 +145,46 @@ tr.addTranslations = function (translations) {
 }
 
 /**
- * Registers a new formatter by its name.
- * 
- * A formatter is an object having a method named format. This method
- * will receive the value of the dynamic argument as parameter and will return
- * the formatted value.
- * @param {string} name The name of the formatter 
- * @param {Object} formatter The formatter itself
+ * Registers named formatters.
+ * This function expects an object as parameter.
+ * Each key of the object is the name of a formatter and the value is the
+ * formatter itself.
+ *
+ * A formatter is either:
+ * - an object having a method named format. This method will receive the
+ *   value of the dynamic argument as parameter and will return the formatted
+ *   value.
+ * - a function that will receive the value of the dynamic argument as
+ *   parameter and will return the formatted value.
+ * @param {Object} formatters
  */
-tr.addFormatter = function (name, formatter) {
-    if (formatter && typeof formatter.format === 'function') {
-        tr[ftSymbol].set(name, formatter);
+tr.addFormatters = function (formatters) {
+    for (const name in formatters) {
+        addFormatter(name, formatters[name]);
     }
 }
 
 /**
- * Loads complete configuration.
- * 
- * @param {Object} config 
+ * Loads a complete configuration.
+ * This function expects an object as parameter with the following properties:
+ *   translations: the translations
+ *   numberFormats: the named formatters that will be converted to Intl.NumberFormat
+ *   dateTimeFormats: the named formatters that will be converted to Intl.DateTimeFormat
+ *
+ * @param {Object} config
  */
 tr.load = function (config) {
     for (const k in config['numberFormats']) {
-        tr.addFormatter(k, new Intl.NumberFormat(config['locales'], config['numberFormats'][k]))
+        addFormatter(k, new Intl.NumberFormat(config['locales'], config['numberFormats'][k]))
     }
     for (const k in config['dateTimeFormats']) {
-        tr.addFormatter(k, new Intl.DateTimeFormat(config['locales'], config['dateTimeFormats'][k]))
+        addFormatter(k, new Intl.DateTimeFormat(config['locales'], config['dateTimeFormats'][k]))
     }
     tr.addTranslations(config['translations']);
 }
 
 /**
- * Clear all the configurations: translations and converters.
+ * Clear all the configurations: translations and formatters.
  */
 tr.clear = function () {
     tr[trSymbol] = {};

@@ -4,7 +4,7 @@ tr.js is a minimalistic module to handle internationalization in JavaScript.
 The module provides *tr* which can be used as a function or a tag function
 of [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals).
 
-As a function, dynamic parameters can be indicated in the template string with 
+As a function, dynamic parameters can be indicated in the template string with
 the expression ```${}```.
 
 ```javascript
@@ -12,6 +12,8 @@ const w = "world";
 
 const translation = tr("Hello the ${}", w);
 ```
+
+As a tag function, you can use template parameters as usual:
 
 ```javascript
 const w = "world";
@@ -31,11 +33,14 @@ tr.addTranslations({
     "hi": "salut"
 });
 
-// result will be "bonjour"
-const translation = tr("hello");
+// prints "bonjour"
+console.log(tr("hello"));
+
+// prints "bonjour"
+console.log(tr`hello`);
 ```
 
-You can specify dynamic parameters in the template string and the translation with 
+You can specify dynamic parameters in the template string and the translation with
 the expression ```${}```.
 
 ```javascript
@@ -43,16 +48,12 @@ tr.addTranslations({
     "hello ${}": "bonjour ${}"
 });
 
-// result will be "bonjour john"
-const translation = tr("hello ${}", "john");
-```
+// prints "bonjour john"
+console.log(tr("hello ${}", "john"));
 
-You can also use a template literal:
-
-```javascript
+// prints "bonjour john"
 const name = "john";
-// result will be "bonjour john"
-const translation = tr`hello ${name}`;
+console.log(tr`hello ${name}`);
 ```
 
 ### Changing order of the dynamic arguments
@@ -65,25 +66,24 @@ tr.addTranslations({
     "total amount ${}${}": "montant total ${1}${0}"
 });
 
-// result will be "montant total 2400$"
-const translation = tr`total amount ${'$'}${24*100}`;
+// prints "montant total 2400$"
+console.log(tr`total amount ${'$'}${24*100}`);
 ```
 
 You can even repeat the same argument several times in the translation:
-
 
 ```javascript
 tr.addTranslations({
     "repeat twice ${}": "${0} ${0}"
 });
 
-// result will be "zoo zoo"
-const translation = tr`repeat twice ${'zoo'}`;
+// prints "zoo zoo"
+console.log(tr`repeat twice ${'zoo'}`);
 ```
 
 ### Support for plural form
 
-As translations, you can provide an array. This is useful to support plural
+You can provide an array for the translation. This is useful to support plural
 form.
 
 ```javascript
@@ -95,13 +95,13 @@ tr.addTranslations({
     ]
 });
 
-// print "no item"
+// prints "no item"
 console.log(tr`${0} items`);
 
-// print "1 item"
+// prints "1 item"
 console.log(tr`${1} items`);
 
-// print "42 items"
+// prints "42 items"
 console.log(tr`${42} items`);
 ```
 If the dynamic argument is a number, its value will be used to select the
@@ -117,7 +117,7 @@ tr.addTranslations({
     ]
 });
 
-// print "cette proposition est vraie"
+// prints "cette proposition est vraie"
 console.log(tr`this proposal is ${true}`);
 ```
 
@@ -140,33 +140,48 @@ console.log(tr`${'Ref0001'}: ${0} items`);
 
 ### Support for formatters
 
-You can register a formatter to be able to use it in a translation.
+You can register formatters to be able to use them in translations.
 
-A formatter is an object with a method named ```format```. This method
-will receive the value of the dynamic argument as parameter and will return
-the formatted value.
+A formatter is either:
+ - an object having a method named ```format```. This method
+   will receive the value of the dynamic argument as parameter and will return
+   the formatted value.
+ - a function that will receive the value of the dynamic argument as
+   parameter and will return the formatted value.
 
-[Intl.NumberFormat](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat) 
-and [Intl.DateTimeFormat](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat) are compliant with this format.
+[Intl.NumberFormat](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat)
+and [Intl.DateTimeFormat](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat) are compliant because the instances have a method named ```format```.
 
-Use the function ```tr.addFormatter``` to add new named formatter:
+Use the function ```tr.addFormatters``` to add new named formatters:
 
 ```javascript
-tr.addFormatter('euros', new Intl.NumberFormat('en', {
-    style: 'currency', 
-    currency: 'EUR' 
-}));
+tr.addFormatters({
+    'euros': new Intl.NumberFormat('en', { style: 'currency', currency: 'EUR' })
+});
 
 tr.addTranslations({
     '${} euros': '${0:euros}'
 })
 
-// print "€1,000.00"
+// prints "€1,000.00"
 console.log(tr`${1000} euros`);
 ```
 
-You can reference your formatter in the translation after the position of the 
-dynamic argument by using the separator ```:```. If you omit the  position of 
+```javascript
+tr.addFormatters({
+    'upper': s => s.toUpperCase()
+});
+
+tr.addTranslations({
+    'Important: ${}': 'Important: ${0:upper}'
+})
+
+// prints "Important: MIND THE GAP"
+console.log(tr`Important: ${'mind the gap'}`);
+```
+
+You can reference your formatter in the translation after the position of the
+dynamic argument by using the separator ```:```. If you omit the  position of
 the dynamic parameter, you still have to specify the separator:
 
 ```javascript
@@ -177,8 +192,78 @@ tr.addTranslations({
 
 ## Loading from the configuration
 
-*TODO*
+You can call the function ```tr.load``` to load a complete configuration at one time
+including translations and formatters.
+
+```tr.load``` waits for an object as parameter with the following properties:
+
+* translations: the translations
+* numberFormats: the named formatters that will be converted to [Intl.NumberFormat](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat)
+* dateTimeFormats: the named formatters that will be converted to [Intl.DateTimeFormat](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/)
+
+```javascript
+tr.load({
+    'locales': 'en',
+    'numberFormats': {
+        'dollars': { style: 'currency', currency: 'USD' }
+    },
+    'dateTimeFormats': {
+        'simpleDate': { dateStyle: 'medium' }
+    },
+    'translations': {
+        'amount ${}': '${:dollars}',
+        'date ${}': '${:simpleDate}'
+    }
+});
+```
+
+A call to ```tr.load``` does not invalidate previous translations or formatters.
+It will add new ones or replace the ones with the same name.
+
+To completely remove translations and formatters previously added, you must
+call ```tr.clear()```.
+
+```javascript
+tr.clear()
+```
 
 ## Tips and guidelines
 
-*TODO*
+tr.js is a versatile library. There is no strict rule to define keys for translation.
+By default, if no translation is available, tr.js will simply returns the formatted
+values passed as parameters. So I recommend you to define keys in a human spoken
+language. This way, the messages will remain understandable even if no translation
+is provided.
+
+```javascript
+// prints 'hello John' if no translation is available
+console.log(tr`hello ${'John'}`);
+```
+
+But you can also use message identifier. tr.js does not expect the variable arguments
+to be part of the message identifier when you use ```tr``` as a function.
+
+```javascript
+tr.addTranslations({
+    'message.hello': 'hello ${}'
+});
+
+// prints 'hello John'
+console.log(tr('message.hello', 'john'));
+```
+
+Even if you do not want to translate your messages to other languages, you can
+use tr.js as a simple formatting library:
+
+```javascript
+tr.addFormatters({
+    'upper': s => s.toUpperCase()
+});
+
+tr.addTranslations({
+    'upper:${}': '${0:upper}'
+})
+
+// prints "A VERY IMPORTANT MESSAGE"
+console.log(tr`upper:${'a very important message'}`);
+```

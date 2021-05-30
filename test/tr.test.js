@@ -197,6 +197,20 @@ test('supports intl formatters', assert => {
     assert.equal(tr`date ${new Date(2000, 0, 1)}`, 'Jan 1, 2000');
 });
 
+test('ignores formatter if the type is unknown or the name is empty', assert => {
+    tr.addFormatters({
+        'fake': {},
+        '': m => "invalid formatter",
+    });
+    tr.addTranslations({
+        'fake formatter ${}': 'fake formatter ${0:fake}',
+        'no name formatter ${}': 'no name formatter ${0:}'
+    });
+
+    assert.equal(tr`fake formatter ${'is ignored'}`, 'fake formatter is ignored');
+    assert.equal(tr`no name formatter ${'is ignored'}`, 'no name formatter is ignored');
+});
+
 test('supports function formatters', assert => {
     tr.addFormatters({
         'upper': s => s.toUpperCase()

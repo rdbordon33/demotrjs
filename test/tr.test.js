@@ -1,4 +1,4 @@
-import tr from '../tr.js';
+import tr from '../index.js';
 
 const test = QUnit.test;
 

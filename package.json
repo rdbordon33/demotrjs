@@ -1,11 +1,12 @@
 {
-  "name": "@dgayerie/trjs",
+  "name": "@dgayerie/tr",
   "version": "1.0.0",
   "description": "A lightweight library to support i18n",
-  "main": "tr.js",
+  "main": "index.js",
   "type": "module",
   "scripts": {
     "build": "tsc && terser --compress --mangle --output tr.min.js -- tr.js",
+    "test": "qunit",
     "test:chrome": "karma start --browsers ChromeHeadless .karma.conf.cjs",
     "test:firefox": "karma start --browsers FirefoxHeadless .karma.conf.cjs",
     "test:browsers": "karma start .karma.conf.cjs"

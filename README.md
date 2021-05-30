@@ -1,13 +1,15 @@
-# tr.js - A lightweight i18n library for JavaScript
+# tr - A lightweight i18n library for JavaScript
 
-tr.js is a minimalistic module to handle internationalization in JavaScript.
-The module provides *tr* which can be used as a function or a tag function
+**tr** is a minimalistic module to handle internationalization in JavaScript.
+The module provides **tr** which can be used as a function or a tag function
 of [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals).
 
 As a function, dynamic parameters can be indicated in the template string with
 the expression ```${}```.
 
 ```javascript
+import tr from '@dgayerie/tr';
+
 const w = "world";
 
 const translation = tr("Hello the ${}", w);
@@ -16,6 +18,8 @@ const translation = tr("Hello the ${}", w);
 As a tag function, you can use template parameters as usual:
 
 ```javascript
+import tr from '@dgayerie/tr';
+
 const w = "world";
 
 const translation = tr`Hello the ${w}`;
@@ -229,8 +233,8 @@ tr.clear()
 
 ## Tips and guidelines
 
-tr.js is a versatile library. There is no strict rule to define keys for translation.
-By default, if no translation is available, tr.js will simply returns the formatted
+**tr** is a versatile library. There is no strict rule to define keys for translation.
+By default, if no translation is available, **tr** will simply returns the formatted
 values passed as parameters. So I recommend you to define keys in a human spoken
 language. This way, the messages will remain understandable even if no translation
 is provided.
@@ -240,7 +244,7 @@ is provided.
 console.log(tr`hello ${'John'}`);
 ```
 
-But you can also use message identifier. tr.js does not expect the variable arguments
+But you can also use message identifier. **tr** does not expect the variable arguments
 to be part of the message identifier when you use ```tr``` as a function.
 
 ```javascript
@@ -253,7 +257,7 @@ console.log(tr('message.hello', 'john'));
 ```
 
 Even if you do not want to translate your messages to other languages, you can
-use tr.js as a simple formatting library:
+use **tr** as a simple formatting library:
 
 ```javascript
 tr.addFormatters({

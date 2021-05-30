@@ -1,6 +1,6 @@
 {
     "include": [
-        "tr.js"
+        "index.js",
     ],
     "compilerOptions": {
         // Tells TypeScript to read JS files, as

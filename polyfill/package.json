@@ -1,4 +1,4 @@
 {
-  "main": "tr.js",
+  "main": "@dgayerie/tr",
   "type": "module"
 }

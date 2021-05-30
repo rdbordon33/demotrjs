@@ -5,8 +5,7 @@
   "main": "tr.js",
   "type": "module",
   "scripts": {
-    "build": "tsc",
-    "test": "qunit",
+    "build": "tsc && terser --compress --mangle --output tr.min.js -- tr.js",
     "test:chrome": "karma start --browsers ChromeHeadless .karma.conf.cjs",
     "test:firefox": "karma start --browsers FirefoxHeadless .karma.conf.cjs",
     "test:browsers": "karma start .karma.conf.cjs"
@@ -16,7 +15,9 @@
     "url": "git+https://github.com/spoonless/trjs.git"
   },
   "keywords": [
-    "i18n"
+    "i18n",
+    "translation",
+    "formatting"
   ],
   "author": "David Gayerie",
   "license": "MIT",
@@ -31,6 +32,7 @@
     "karma-firefox-launcher": "^2.1.0",
     "karma-qunit": "^4.1.2",
     "qunit": "^2.15.0",
+    "terser": "^5.7.0",
     "typescript": "^4.2.4"
   }
 }

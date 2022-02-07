@@ -197,6 +197,20 @@ test('supports intl formatters', assert => {
     assert.equal(tr`date ${new Date(2000, 0, 1)}`, 'Jan 1, 2000');
 });
 
+test('supports wrong data format with intl formatters', assert => {
+    tr.addFormatters({
+        'euros': new Intl.NumberFormat('en', { style: 'currency', currency: 'EUR' }),
+        'date': new Intl.DateTimeFormat('en', { dateStyle: 'medium' })
+    });
+    tr.addTranslations({
+        'amount ${}': '${0:euros}',
+        'date ${}': '${:date}'
+    });
+
+    assert.equal(tr`amount ${'a'}`, '€NaN');
+    assert.equal(tr`date ${'a'}`, 'a');
+});
+
 test('ignores formatter if the type is unknown or the name is empty', assert => {
     tr.addFormatters({
         'fake': {},

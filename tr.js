@@ -109,6 +109,28 @@ class Translator {
 }
 
 /**
+ * A class to decorate a formatter to make it able to handle errors.
+ * 
+ * A safe formatter returns the raw value in case of exception
+ */
+class SafeFormatter {
+    constructor(formatter) {
+        this._formatter = formatter;
+        if (typeof this._formatter.format === "function") {
+            this._formatter = this._formatter.format.bind(this._formatter);
+        }
+    }
+
+    format(v) {
+        try {
+            return this._formatter(v);
+        } catch {
+            return v;
+        }
+    }
+}
+
+/**
  * tr can be used as a function or a tag function of template literals.
  *
  * As a function, the first parameter is the template with dynamic parameters indicated by ${}.
@@ -160,7 +182,7 @@ tr.addTranslations = function (translations) {
  */
 tr.addFormatters = function (formatters) {
     for (const name in formatters) {
-        addFormatter(name, formatters[name]);
+        addFormatter(name, new SafeFormatter(formatters[name]));
     }
 }
 
@@ -175,10 +197,10 @@ tr.addFormatters = function (formatters) {
  */
 tr.load = function (config) {
     for (const k in config['numberFormats']) {
-        addFormatter(k, new Intl.NumberFormat(config['locales'], config['numberFormats'][k]))
+        addFormatter(k, new SafeFormatter(new Intl.NumberFormat(config['locales'], config['numberFormats'][k])));
     }
     for (const k in config['dateTimeFormats']) {
-        addFormatter(k, new Intl.DateTimeFormat(config['locales'], config['dateTimeFormats'][k]))
+        addFormatter(k, new SafeFormatter(new Intl.DateTimeFormat(config['locales'], config['dateTimeFormats'][k])));
     }
     tr.addTranslations(config['translations']);
 }

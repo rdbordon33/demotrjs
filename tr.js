@@ -194,3 +194,6 @@ tr.clear = function () {
 tr.clear();
 
 export default tr;
+
+// initialisation du compteur i
+let i = 0;

@@ -1,3 +1,4 @@
+// tests...
 import tr from '../tr.js';
 
 const test = QUnit.test;

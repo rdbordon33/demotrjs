@@ -1,3 +1,4 @@
+// fonction tr dans Polyfill
 function tr(strings, ...args) {
     if (!Array.isArray(strings)) {
         if (typeof strings !== 'string') {

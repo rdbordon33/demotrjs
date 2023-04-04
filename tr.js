@@ -159,6 +159,7 @@ function tr(strings, ...args) {
 }
 
 /**
+ * MODIF KARIM
  * Provides new translations.
  *
  * This function expects an object as parameter.

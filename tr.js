@@ -1,3 +1,4 @@
+// tr à la racine
 const trSymbol = Symbol();
 const ftSymbol = Symbol();
 const argRegExp = /\$\{\s*([^\}]*)\s*\}/;

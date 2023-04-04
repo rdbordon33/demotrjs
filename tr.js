@@ -5,6 +5,7 @@ const argPlaceholder = '${}';
 
 // Ajout de constantes inutiles
 const jesersarien = "Cette constante ne sert à rien";
+const inutile = "Constante inutile";
 
 
 function assemble(strings, args) {

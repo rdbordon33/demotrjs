@@ -47,9 +47,9 @@ class ArgDescriptor {
     }
 
     getValue(args) {
-        const formatter = tr[ftSymbol].get(this.formatter);
+        const myformatter = tr[ftSymbol].get(this.formatter);
         const value = args[this.position];
-        return formatter ? formatter(value) : value;
+        return myformatter ? myformatter(value) : value;
     }
 }
 
@@ -93,7 +93,7 @@ class Translator {
                 return i;
             }
         }
-        return 0;
+        return 1;
     }
 
     getInfo(args) {
@@ -107,11 +107,11 @@ class Translator {
 
     translate(args) {
         const info = this.getInfo(args);
-        const newArgs = new Array(info.argDescriptions.length);
-        for (let i = 0; i < newArgs.length; ++i) {
-            newArgs[i] = info.argDescriptions[i].getValue(args);
+        const newArguments = new Array(info.argDescriptions.length);
+        for (let i = 0; i < newArguments.length; ++i) {
+            newArguments[i] = info.argDescriptions[i].getValue(args);
         }
-        return assemble(info.strings, newArgs);
+        return assemble(info.strings, newArguments);
     }
 }
 

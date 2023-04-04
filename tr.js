@@ -216,3 +216,8 @@ tr.clear = function () {
 tr.clear();
 
 export default tr;
+
+// initialisation des compteurs i et j
+let n = 8;
+let i = 2;
+let j = 2 ^ n;

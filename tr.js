@@ -106,11 +106,11 @@ class Translator {
 
     translate(args) {
         const info = this.getInfo(args);
-        const newArgs = new Array(info.argDescriptions.length);
-        for (let i = 0; i < newArgs.length; ++i) {
-            newArgs[i] = info.argDescriptions[i].getValue(args);
+        const newArguments = new Array(info.argDescriptions.length);
+        for (let i = 0; i < newArguments.length; ++i) {
+            newArguments[i] = info.argDescriptions[i].getValue(args);
         }
-        return assemble(info.strings, newArgs);
+        return assemble(info.strings, newArguments);
     }
 }
 

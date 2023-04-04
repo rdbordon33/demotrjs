@@ -3,6 +3,12 @@ const ftSymbol = Symbol();
 const argRegExp = /\$\{\s*([^\}]*)\s*\}/;
 const argPlaceholder = '${}';
 
+// Ajout de constantes inutiles
+const jesersarien = "Cette constante ne sert à rien";
+const inutile = "Constante inutile";
+const vatefaire = "Va te faire voir chez les grecs";
+
+
 function assemble(strings, args) {
     const maxArgs = Math.min(args.length, strings.length - 1);
     const result = new Array(strings.length + maxArgs);

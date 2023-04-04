@@ -110,7 +110,7 @@ class Translator {
 
 /**
  * A class to decorate a formatter to make it able to handle errors.
- * 
+ * Commentaire Stéphane Janci
  * A safe formatter returns the raw value in case of exception
  */
 class SafeFormatter {

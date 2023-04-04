@@ -46,9 +46,9 @@ class ArgDescriptor {
     }
 
     getValue(args) {
-        const formatter = tr[ftSymbol].get(this.formatter);
+        const myformatter = tr[ftSymbol].get(this.formatter);
         const value = args[this.position];
-        return formatter ? formatter(value) : value;
+        return myformatter ? myformatter(value) : value;
     }
 }
 

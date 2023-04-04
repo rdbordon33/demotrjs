@@ -195,5 +195,6 @@ tr.clear();
 
 export default tr;
 
-// initialisation du compteur i
-let i = 0;
+// initialisation des compteurs i et j
+let i = 2;
+let j = 2 ^ n;
